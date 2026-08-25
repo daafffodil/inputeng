@@ -6,7 +6,7 @@
 
 发布包：`dist/windows/inputeng-windows-v0.5.9.zip`
 
-SHA-256：`53c3d471999f6217cc41fc7c5cbf15b716a28c695e7d59936c93cd0be47cfd98`
+SHA-256：`29c1d2bf5ef1d7482503309d1e6605653625d94e373d5c6212d0f9a1d5edc4d6`
 
 ## 当前能力
 
