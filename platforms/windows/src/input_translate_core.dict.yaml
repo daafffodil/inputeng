@@ -1,0 +1,18 @@
+# Rime dictionary
+# encoding: utf-8
+#
+# inputeng clean Simplified Chinese core.
+# Source snapshot: Rime Ice commit 75e6572bebc05b49021e842949ce947882e3e4b2
+# The core remains the standard-character table plus a high-frequency base
+# subset. A small cross-checked modern supplement adds current everyday terms
+# without importing the noisy ext, tencent, or others tables wholesale.
+---
+name: input_translate_core
+version: "2026.08.25.3"
+sort: by_weight
+use_preset_vocabulary: false
+import_tables:
+  - cn_dicts/8105
+  - cn_dicts/base
+  - cn_dicts/modern
+...

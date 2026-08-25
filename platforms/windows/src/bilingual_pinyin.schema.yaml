@@ -1,0 +1,100 @@
+# Rime schema
+# encoding: utf-8
+
+# Reuse Weasel's bundled pinyin parser and UI defaults, but replace Luna
+# Pinyin's Chinese lexicon with inputeng's curated Simplified core.
+__include: luna_pinyin_simp.schema:/
+
+schema:
+  schema_id: bilingual_pinyin
+  name: inputeng
+  version: "0.5.9"
+  author:
+    - inputeng contributors
+  description: |
+    普通简体拼音输入；中文候选旁显示简短英文释义。
+    非拼音英文可以直接上屏，并在旁边显示简短中文释义。
+
+# The scheme displays Simplified Chinese only. The lookup table also contains
+# Traditional aliases for Rime's underlying genuine candidate text.
+# ShadowCandidate changes only the visible comment.
+engine:
+  processors:
+    - lua_processor@*schema_toggle_processor
+    - ascii_composer
+    - recognizer
+    - key_binder
+    - speller
+    - punctuator
+    - selector
+    - navigator
+    - lua_processor@*personal_phrase_processor
+    - express_editor
+  translators:
+    - punct_translator
+    - reverse_lookup_translator
+    - lua_translator@*english_comment_translator
+    - lua_translator@*personal_phrase_translator
+    - script_translator
+  filters:
+    # Weasel 0.17.4 bundles Luna Pinyin 0.22, whose Simplified schema uses
+    # the plain `simplifier` namespace with the `zh_simp` option. Referring
+    # to the newer `zh_hans` namespace leaves the filter unconfigured and
+    # therefore produces Traditional candidates.
+    - simplifier
+    - lua_filter@*english_mode_filter
+    - lua_filter@*bilingual_comment
+    - uniquifier
+
+translator:
+  dictionary: input_translate_core
+  user_dict: input_translate_core
+  prism: bilingual_pinyin
+  # The public lexicon is already limited to common words, so sentence
+  # composition can safely join clean segments such as "er qie t" or
+  # "mei you xin de dong xi" instead of forcing one segment at a time.
+  enable_sentence: true
+  # Use apostrophes between completed syllables in the visible composition.
+  # This changes only the preedit display; users can still type continuously.
+  preedit_format:
+    - xform/ /'/
+
+speller:
+  # Luna Pinyin normally renders completed syllables with spaces. Keep a
+  # single apostrophe as the visible and manually typable separator instead.
+  delimiter: "'"
+
+# Keep every page at five logical slots. Weasel normally shrinks the window
+# when an English query or a rare spelling yields fewer candidates.
+menu:
+  page_size: 5
+
+# Weasel can apply these settings per schema. The two color schemes are
+# installed into weasel.custom.yaml by install.ps1.
+style:
+  color_scheme: input_translate_light
+  color_scheme_dark: input_translate_dark
+  horizontal: false
+  # Keep the current letter composition in the application's input field.
+  # The candidate-window header stays disabled to avoid an extra row.
+  inline_preedit: true
+  font_point: 12
+  label_font_point: 12
+  comment_font_point: 9
+  layout:
+    # Width still follows the current content, while height reserves the same
+    # five-row area so pages with 1, 3 or 5 candidates do not jump vertically.
+    align_type: bottom
+    min_width: 120
+    max_width: 220
+    # 152 matches five rows at the current 12/9-point typography. The old
+    # value of 184 reserved roughly six rows and left a false blank row even
+    # when five real candidates were already visible.
+    min_height: 152
+    margin_x: 8
+    margin_y: 8
+    candidate_spacing: 4
+    hilite_spacing: 3
+    hilite_padding: 4
+    corner_radius: 8
+    round_corner: 6

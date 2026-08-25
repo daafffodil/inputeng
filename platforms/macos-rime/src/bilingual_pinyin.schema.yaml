@@ -1,0 +1,26 @@
+# Rime schema
+# encoding: utf-8
+
+# 复用鼠须管自带的「朙月拼音·简化字」，只增加英文候选注释。
+__include: luna_pinyin_simp.schema:/
+
+schema:
+  schema_id: bilingual_pinyin
+  name: inputeng
+  version: "0.2.0"
+  author:
+    - inputeng contributors
+  description: |
+    普通简体拼音输入；候选词命中本地中英词典时，在旁边显示简短英文释义。
+    英文仅作为 comment 显示，不会随中文候选上屏。
+
+# 明确列出过滤器顺序：先转简体，再查简体中英词典，最后去重。
+engine:
+  filters:
+    - simplifier
+    - lua_filter@*bilingual_comment
+    - uniquifier
+
+# 使用独立 prism，不影响原有朙月拼音的用户数据。
+translator:
+  prism: bilingual_pinyin

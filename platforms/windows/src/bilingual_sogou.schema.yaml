@@ -1,0 +1,145 @@
+# Rime schema
+# encoding: utf-8
+
+# inputeng using the Sogou double-pinyin key map. The algebra follows
+# the maintained Rime Ice Sogou scheme, while the dictionary and bilingual
+# comment filter remain inputeng's compact Simplified Chinese layers.
+__include: luna_pinyin_simp.schema:/
+
+schema:
+  schema_id: bilingual_sogou
+  name: inputeng 搜狗双拼
+  version: "0.5.9"
+  author:
+    - inputeng contributors
+  description: |
+    搜狗双拼简体输入；中文候选旁显示简短英文释义。
+    为避免双拼短码被英文单词抢占，本方案只保留中文到英文注释。
+
+engine:
+  processors:
+    - lua_processor@*schema_toggle_processor
+    - ascii_composer
+    - recognizer
+    - key_binder
+    - speller
+    - punctuator
+    - selector
+    - navigator
+    - lua_processor@*personal_phrase_processor
+    - express_editor
+  translators:
+    - punct_translator
+    - reverse_lookup_translator
+    - lua_translator@*personal_phrase_translator
+    - script_translator
+  filters:
+    - simplifier
+    - lua_filter@*bilingual_comment
+    - uniquifier
+
+speller:
+  alphabet: zyxwvutsrqponmlkjihgfedcba
+  initials: zyxwvutsrqponmlkjihgfedcba
+  delimiter: "'"
+  algebra:
+    - erase/^xx$/
+    - derive/^([jqxy])u$/$1v/
+    - derive/^([aoe].*)$/o$1/
+    - xform/^([ae])(.*)$/$1$1$2/
+    - xform/iu$/Ⓠ/
+    - xform/[iu]a$/Ⓦ/
+    - xform/er$|[uv]an$/Ⓡ/
+    - xform/[uv]e$/Ⓣ/
+    - xform/v$|uai$/Ⓨ/
+    - xform/^sh/Ⓤ/
+    - xform/^ch/Ⓘ/
+    - xform/^zh/Ⓥ/
+    - xform/uo$/Ⓞ/
+    - xform/[uv]n$/Ⓟ/
+    - xform/(.)i?ong$/$1Ⓢ/
+    - xform/[iu]ang$/Ⓓ/
+    - xform/(.)en$/$1Ⓕ/
+    - xform/(.)eng$/$1Ⓖ/
+    - xform/(.)ang$/$1Ⓗ/
+    - xform/ian$/Ⓜ/
+    - xform/(.)an$/$1Ⓙ/
+    - xform/iao$/Ⓒ/
+    - xform/(.)ao$/$1Ⓚ/
+    - xform/(.)ai$/$1Ⓛ/
+    - xform/(.)ei$/$1Ⓩ/
+    - xform/ie$/Ⓧ/
+    - xform/ui$/Ⓥ/
+    - xform/(.)ou$/$1Ⓑ/
+    - xform/in$/Ⓝ/
+    - xform/ing$/;/
+    - xlit/ⓆⓌⓇⓉⓎⓊⒾⓄⓅⓈⒹⒻⒼⒽⓂⒿⒸⓀⓁⓏⓍⓋⒷⓃ/qwrtyuiopsdfghmjcklzxvbn/
+
+translator:
+  dictionary: input_translate_core
+  user_dict: input_translate_core_sogou
+  prism: bilingual_sogou
+  enable_sentence: true
+  preedit_format:
+    - xform/([aoe])(\w)/0$2/
+    - xform/([bpmnljqxy])n/$1in/
+    - xform/(\w)g/$1eng/
+    - xform/(\w)q/$1iu/
+    - xform/([gkhvuirzcs])w/$1ua/
+    - xform/(\w)w/$1ia/
+    - xform/([dtnlgkhjqxyvuirzcs])r/$1uan/
+    - xform/0r/er/
+    - xform/([dtgkhvuirzcs])v/$1ui/
+    - xform/(\w)v/$1ve/
+    - xform/(\w)t/$1ve/
+    - xform/([gkhvuirzcs])y/$1uai/
+    - xform/(\w)y/$1v/
+    - xform/([dtnlgkhvuirzcs])o/$1uo/
+    - xform/(\w)p/$1un/
+    - xform/([jqx])s/$1iong/
+    - xform/(\w)s/$1ong/
+    - xform/([jqxnlb])d/$1iang/
+    - xform/(\w)d/$1uang/
+    - xform/(\w)f/$1en/
+    - xform/(\w)h/$1ang/
+    - xform/(\w)j/$1an/
+    - xform/(\w)k/$1ao/
+    - xform/(\w)l/$1ai/
+    - xform/(\w)z/$1ei/
+    - xform/(\w)x/$1ie/
+    - xform/(\w)c/$1iao/
+    - xform/(\w)b/$1ou/
+    - xform/(\w)m/$1ian/
+    - xform/(\w);/$1ing/
+    - xform/0(\w)/$1/
+    - "xform/(^|[ '])v/$1zh/"
+    - "xform/(^|[ '])i/$1ch/"
+    - "xform/(^|[ '])u/$1sh/"
+    - xform/([jqxy])v/$1u/
+    - xform/([nl])v/$1ü/
+    - xform/ü/v/
+    - xform/ /'/
+
+menu:
+  page_size: 5
+
+style:
+  color_scheme: input_translate_light
+  color_scheme_dark: input_translate_dark
+  horizontal: false
+  inline_preedit: true
+  font_point: 12
+  label_font_point: 12
+  comment_font_point: 9
+  layout:
+    align_type: bottom
+    min_width: 120
+    max_width: 220
+    min_height: 152
+    margin_x: 8
+    margin_y: 8
+    candidate_spacing: 4
+    hilite_spacing: 3
+    hilite_padding: 4
+    corner_radius: 8
+    round_corner: 6

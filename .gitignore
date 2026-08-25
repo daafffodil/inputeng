@@ -1,0 +1,39 @@
+__pycache__/
+*.pyc
+*.log
+.DS_Store
+Thumbs.db
+build/
+tmp/
+runtime-data/
+
+# Generated packages and release artifacts
+dist/
+platforms/*/package/
+*.zip
+*.zip.sha256
+
+# Local migration notes and editor state
+docs/migration-*.md
+.idea/
+.vscode/
+
+# Secrets and per-user runtime data
+.env
+.env.*
+!.env.example
+*.key
+*.pem
+*.p12
+*.dpapi
+*credentials*
+*secret*
+input_translate_ai_cache.tsv
+input_translate_ai_chinese_cache.tsv
+input_translate_missing.txt
+input_translate_english_missing.txt
+input_translate_personal_phrases.tsv
+input_translate_frequency*
+settings.json
+install-manifest.json
+weasel-profile-backup.json

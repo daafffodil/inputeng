@@ -1,0 +1,95 @@
+# Rime dictionary
+# encoding: utf-8
+#
+# inputeng curated modern Simplified Chinese supplement.
+# Every row is absent from the conservative core and is either cross-checked
+# against current public dictionaries or added from confirmed user feedback.
+# Fixed low weight keeps established common words ahead of supplementary terms.
+---
+name: modern
+version: "2026.08.25"
+sort: by_weight
+columns:
+  - text
+  - code
+  - weight
+...
+玫粉色	mei fen se	4500
+松弛感	song chi gan	4500
+显眼包	xian yan bao	4500
+情绪价值	qing xu jia zhi	4500
+电子榨菜	dian zi zha cai	4500
+饭搭子	fan da zi	4500
+打工人	da gong ren	4500
+工具人	gong ju ren	4500
+干饭人	gan fan ren	4500
+气氛组	qi fen zu	4500
+氛围感	fen wei gan	4500
+科技感	ke ji gan	4500
+高级感	gao ji gan	4500
+颗粒感	ke li gan	4500
+钝感力	dun gan li	4500
+社牛	she niu	4500
+内卷	nei juan	4500
+反内卷	fan nei juan	4500
+拔草	ba cao	4500
+短视频	duan shi pin	4500
+自媒体	zi mei ti	4500
+小红书	xiao hong shu	4500
+视频号	shi pin hao	4500
+知识付费	zhi shi fu fei	4500
+私域流量	si yu liu liang	4500
+公域流量	gong yu liu liang	4500
+数字人	shu zi ren	4500
+元宇宙	yuan yu zhou	4500
+大模型	da mo xing	4500
+语言模型	yu yan mo xing	4500
+智能体	zhi neng ti	4500
+工作流	gong zuo liu	4500
+云办公	yun ban gong	4500
+远程办公	yuan cheng ban gong	4500
+低代码	di dai ma	4500
+无代码	wu dai ma	4500
+低空经济	di kong jing ji	4500
+新质生产力	xin zhi sheng chan li	4500
+碳中和	tan zhong he	4500
+碳达峰	tan da feng	4500
+智能汽车	zhi neng qi che	4500
+辅助驾驶	fu zhu jia shi	4500
+自动驾驶	zi dong jia shi	4500
+预制菜	yu zhi cai	4500
+螺蛳粉	luo si fen	4500
+无糖饮料	wu tang yin liao	4500
+植物肉	zhi wu rou	4500
+空气炸锅	kong qi zha guo	4500
+断舍离	duan she li	4500
+通勤穿搭	tong qin chuan da	4500
+奶油风	nai you feng	4500
+原木风	yuan mu feng	4500
+新中式	xin zhong shi	4500
+马卡龙色	ma ka long se	4500
+玫瑰金	mei gui jin	4500
+莫兰迪色	mo lan di se	4500
+轻奢风	qing she feng	4500
+极简风	ji jian feng	4500
+防晒衣	fang shai yi	4500
+瑜伽裤	yu jia ku	4500
+老爹鞋	lao die xie	4500
+洞洞鞋	dong dong xie	4500
+精神内耗	jing shen nei hao	4500
+容貌焦虑	rong mao jiao lu	4500
+信息茧房	xin xi jian fang	4500
+碎片化	sui pian hua	4500
+沉浸式	chen jin shi	4500
+体验感	ti yan gan	4500
+获得感	huo de gan	4500
+边界感	bian jie gan	4500
+分寸感	fen cun gan	4500
+参与感	can yu gan	4500
+陪伴感	pei ban gan	4500
+仪式感	yi shi gan	4500
+镜头感	jing tou gan	4500
+臀推	tun tui	4500
+麻薯	ma shu	4500
+臀桥	tun qiao	4500
+芋泥	yu ni	4500
