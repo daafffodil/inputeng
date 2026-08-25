@@ -6,6 +6,7 @@ from __future__ import annotations
 import hashlib
 import http.server
 import json
+import os
 import shutil
 import subprocess
 import tempfile
@@ -747,7 +748,10 @@ def main() -> None:
         test_existing_managed_file_backup(temp_root)
         test_weasel_settings_rewrite_cycle(temp_root)
         test_settings_appearance(temp_root)
-        test_deepseek_worker_with_mock_api(temp_root)
+        if os.environ.get("CI", "").casefold() != "true":
+            test_deepseek_worker_with_mock_api(temp_root)
+        else:
+            print("Skipped DPAPI worker test on hosted CI")
     print("Windows package validation passed")
 
 
