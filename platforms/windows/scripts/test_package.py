@@ -215,8 +215,11 @@ def validate_yaml_and_lua() -> None:
     assert sogou["style"]["inline_preedit"] is True
 
     windows_lua = PACKAGE_ROOT / "lua" / "bilingual_comment.lua"
-    mac_lua = PROJECT_ROOT / "platforms" / "macos-rime" / "src" / "lua" / "bilingual_comment.lua"
-    assert file_hash(windows_lua) == file_hash(mac_lua)
+    mac_package_builder = (
+        PROJECT_ROOT / "platforms" / "macos-rime" / "scripts" / "package.py"
+    ).read_text(encoding="utf-8")
+    assert 'shutil.copytree(WINDOWS_SOURCE_ROOT / "lua"' in mac_package_builder
+    assert 'shutil.copytree(WINDOWS_SOURCE_ROOT / "cn_dicts"' in mac_package_builder
     bilingual_lua = windows_lua.read_text(encoding="utf-8")
     assert "RUNTIME_REFRESH_SECONDS = 1" in bilingual_lua
     assert "MISSING_BATCH_SIZE = 5" in bilingual_lua
@@ -284,6 +287,14 @@ def validate_yaml_and_lua() -> None:
     assert "0x00000804" in brand
     assert "weasel-profile-backup.json" in brand
     assert "inputeng" in brand
+    assert "SendMessageTimeout" in brand
+    installer = (PACKAGE_ROOT / "install.ps1").read_text(encoding="utf-8")
+    assert "[switch]$InstallWeasel" in installer
+    assert "[switch]$AcceptWeaselDownload" in installer
+    assert "[switch]$SilentWeaselInstall" in installer
+    assert "-NonInteractive -InstallWeasel -AcceptWeaselDownload -SilentWeaselInstall" not in installer
+    assert "Windows 输入法列表名称：inputeng；图标：E。" not in installer
+    assert "注销当前 Windows 账户并重新登录" in installer
     icon = (PACKAGE_ROOT / "branding" / "inputeng.ico").read_bytes()
     assert icon[:6] == b"\x00\x00\x01\x00\x08\x00", icon[:6]
 

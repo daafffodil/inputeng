@@ -6,6 +6,9 @@ param(
     [switch]$SkipDeploy,
     [switch]$SkipBackgroundWorker,
     [switch]$SkipBranding,
+    [switch]$InstallWeasel,
+    [switch]$AcceptWeaselDownload,
+    [switch]$SilentWeaselInstall,
     [switch]$NonInteractive
 )
 
@@ -13,7 +16,7 @@ $ErrorActionPreference = 'Stop'
 Set-StrictMode -Version 2.0
 
 $ProductName = 'inputeng'
-$ProductVersion = '0.5.9'
+$ProductVersion = '0.6.0'
 $WeaselVersion = '0.17.4'
 $WeaselInstallerName = 'weasel-0.17.4.0-installer.exe'
 $WeaselInstallerUrl = 'https://github.com/rime/weasel/releases/download/0.17.4/weasel-0.17.4.0-installer.exe'
@@ -204,15 +207,27 @@ public static class $typeName {
 }
 
 function Install-WeaselDependency {
-    if ($NonInteractive) {
-        throw "Weasel is not installed. Install Weasel $WeaselVersion first, then run this installer again."
+    if ($NonInteractive -and (-not $InstallWeasel -or -not $AcceptWeaselDownload -or -not $SilentWeaselInstall)) {
+        throw (
+            "Weasel is not installed. For an unattended installation, explicitly authorize the pinned dependency with " +
+            "-InstallWeasel -AcceptWeaselDownload -SilentWeaselInstall, or install Weasel $WeaselVersion first."
+        )
     }
 
-    Write-Host ""
-    Write-Host "未检测到小狼毫。inputeng Windows 版需要官方小狼毫 $WeaselVersion。" -ForegroundColor Yellow
-    $answer = Read-Host '是否从 Rime 官方 GitHub 下载并启动小狼毫安装程序？[Y/n]'
-    if ($answer -and $answer -notmatch '^[Yy]') {
-        throw 'Installation cancelled. Weasel was not installed.'
+    if (-not $InstallWeasel) {
+        Write-Host ""
+        Write-Host "未检测到小狼毫。inputeng Windows 版需要官方小狼毫 $WeaselVersion。" -ForegroundColor Yellow
+        $answer = Read-Host '是否从 Rime 官方 GitHub 下载并启动小狼毫安装程序？[Y/n]'
+        if ($answer -and $answer -notmatch '^[Yy]') {
+            throw 'Installation cancelled. Weasel was not installed.'
+        }
+    }
+
+    if (-not $AcceptWeaselDownload -and $InstallWeasel) {
+        $answer = Read-Host '确认从 Rime 官方 GitHub 下载固定版本并校验 SHA-256？[Y/n]'
+        if ($answer -and $answer -notmatch '^[Yy]') {
+            throw 'Installation cancelled. The Weasel download was not authorized.'
+        }
     }
 
     $downloadPath = Join-Path $env:TEMP $WeaselInstallerName
@@ -226,11 +241,22 @@ function Install-WeaselDependency {
         throw "Weasel installer SHA-256 mismatch. Expected $WeaselInstallerSha256, got $actualHash."
     }
 
-    Write-Host '校验通过，正在启动官方安装程序。可能会出现 Windows 管理员确认窗口。'
-    $process = Start-Process -FilePath $downloadPath -Wait -PassThru
+    $signature = Get-AuthenticodeSignature -LiteralPath $downloadPath
+    if ($signature.Status -ne 'Valid') {
+        Write-Warning 'Rime 官方小狼毫安装包当前没有有效的 Authenticode 数字签名，Windows 可能显示“未知发布者”；inputeng 已按固定 SHA-256 验证文件完整性。'
+    }
+
+    if ($SilentWeaselInstall) {
+        Write-Host '校验通过，正在静默安装官方小狼毫。可能会出现 Windows 管理员确认窗口。'
+        $process = Start-Process -FilePath $downloadPath -ArgumentList '/S' -Wait -PassThru
+    } else {
+        Write-Host '校验通过，正在启动官方安装程序。可能会出现 Windows 管理员确认窗口。'
+        $process = Start-Process -FilePath $downloadPath -Wait -PassThru
+    }
     if ($process.ExitCode -ne 0) {
         throw "Weasel installer exited with code $($process.ExitCode)."
     }
+    Remove-Item -LiteralPath $downloadPath -Force -ErrorAction SilentlyContinue
 }
 
 function Install-InputEngBranding {
@@ -254,7 +280,7 @@ function Install-InputEngBranding {
     }
 }
 
-function Test-InputEngBranding {
+function Test-InputEngBrandingRegistry {
     $profilePath = 'HKLM:\SOFTWARE\Microsoft\CTF\TIP\{A3F4CDED-B1E9-41EE-9CA6-7B4D0DE6CB0A}\LanguageProfile\0x00000804\{3D02CAB6-2B8E-4781-BA20-1C9267529467}'
     try {
         $profile = Get-ItemProperty -LiteralPath $profilePath
@@ -722,12 +748,13 @@ if (-not $SkipBackgroundWorker) {
 }
 
 $branding = $null
-if (-not $SkipWeaselCheck -and (Test-InputEngBranding)) {
+if (-not $SkipWeaselCheck -and (Test-InputEngBrandingRegistry)) {
     $branding = [ordered]@{
         applied = $true
         name = 'inputeng'
         icon = 'E'
         helperPath = (Join-Path $StateRoot 'helper\brand-weasel.ps1')
+        mayRequireSignOut = $true
     }
 } elseif (-not $SkipBranding -and -not $SkipWeaselCheck) {
     try {
@@ -776,5 +803,6 @@ Write-Host '外观、词库与 AI 翻译设置入口：开始菜单 → inputeng
     Write-Host 'DeepSeek 缺词补全入口：开始菜单 → inputeng → 配置 DeepSeek。'
 }
 if ($null -ne $branding) {
-    Write-Host 'Windows 输入法列表名称：inputeng；图标：E。'
+    Write-Host 'inputeng 名称和 E 图标已写入 Windows 语言配置。' -ForegroundColor Green
+    Write-Warning 'Windows 可能继续显示已缓存的“小狼毫”名称或旧图标。若 Win + Space 未立即更新，请注销当前 Windows 账户并重新登录；安装器不会强制结束 ctfmon.exe、TextInputHost.exe 或 explorer.exe。'
 }

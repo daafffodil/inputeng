@@ -58,7 +58,19 @@ if ($Action -eq 'Apply') {
     Set-ItemProperty -LiteralPath $ProfilePath -Name Description -Value $BrandName -Type String
     Set-ItemProperty -LiteralPath $ProfilePath -Name IconFile -Value $InstalledIcon -Type String
     Set-ItemProperty -LiteralPath $ProfilePath -Name IconIndex -Value 0 -Type DWord
-    Write-Host "Windows language profile branded as $BrandName."
+    # Notify well-behaved shell components, but do not claim that every
+    # already-running TSF/Shell process has discarded its cached profile.
+    Add-Type -Namespace InputEng -Name NativeMethods -MemberDefinition @'
+[System.Runtime.InteropServices.DllImport("user32.dll", CharSet = System.Runtime.InteropServices.CharSet.Unicode, SetLastError = true)]
+public static extern System.IntPtr SendMessageTimeout(
+    System.IntPtr hWnd, uint Msg, System.IntPtr wParam, string lParam,
+    uint fuFlags, uint uTimeout, out System.IntPtr lpdwResult);
+'@
+    $broadcastResult = [IntPtr]::Zero
+    [void][InputEng.NativeMethods]::SendMessageTimeout(
+        [IntPtr]0xffff, 0x001A, [IntPtr]::Zero, 'intl', 0x0002, 2000, [ref]$broadcastResult
+    )
+    Write-Host "Windows language profile registry values were updated for $BrandName."
     exit 0
 }
 

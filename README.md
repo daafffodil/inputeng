@@ -10,7 +10,7 @@ inputeng 是一个基于 Rime 的简体中文输入方案。正常输入中文�
 
 ![inputeng 候选窗预览](docs/assets/inputeng-preview.png)
 
-> Windows 版已经过真实小狼毫和 librime 验证。macOS 版目前仍是等待真实 Mac 验收的实验预览版。
+> Windows 版已经过真实小狼毫和 librime 验证。macOS 版已经升级到相同核心功能，并通过 macOS GitHub Runner 的安装与脚本测试；候选视觉和实际输入体验仍等待真实 Mac 验收。
 
 ## 功能
 
@@ -28,24 +28,24 @@ inputeng 是一个基于 Rime 的简体中文输入方案。正常输入中文�
 
 [下载最新版本](https://github.com/daafffodil/inputeng/releases/latest)
 
-1. 下载并完整解压 `inputeng-windows-v0.5.9.zip`。
+1. 下载并完整解压 `inputeng-windows-v0.6.0.zip`。
 2. 双击 `install.cmd`。
 3. 如果电脑尚未安装小狼毫，安装器会询问是否从 Rime 官方 GitHub 下载固定版本，并校验 SHA-256。
 4. 安装完成后，在 Windows 输入法列表中选择 **inputeng**。
 5. 从开始菜单打开 **inputeng 设置**，可以调整外观、查看词库说明或配置 AI 翻译。
 
-通常不需要退出 Windows 账户。卸载时双击 `uninstall.cmd`；卸载器不会删除小狼毫，也不会删除用户自己学习的词语。
+输入方案通常不需要退出 Windows 账户。由于 inputeng 与其他 Rime 方案共用小狼毫的 TSF profile，如果 `Win + Space` 仍显示缓存的“小狼毫”名称或旧图标，安装器会提示注销并重新登录。卸载时双击 `uninstall.cmd`；卸载器不会删除小狼毫，也不会删除用户自己学习的词语。
 
-### macOS 实验版
+### macOS
 
-macOS 版依赖带 `librime-lua` 的鼠须管，当前只提供离线中译英候选注释，尚未完成真实 Mac 验收。安装步骤见 [macOS 说明](platforms/macos-rime/README.md)。
+macOS 版依赖近期正式版鼠须管。v0.6.0 与 Windows 共用同一套中文核心词库、双向离线释义、全拼/搜狗双拼、F4 切换、个人短语学习和 DeepSeek 缺词翻译；API Key 保存到 macOS 钥匙串。安装步骤见 [macOS 说明](platforms/macos-rime/README.md)。
 
 ## AI 翻译与 API Key
 
 AI 翻译完全可选。仓库和发布包中**不包含作者的 API Key，也不会提供共用 Key**。
 
 - 每位使用者需要在本机自行填写自己的 DeepSeek API Key。
-- Windows 使用 DPAPI 按当前账户加密保存 Key，不把明文写入项目目录或 Rime 配置文件。
+- Windows 使用 DPAPI、macOS 使用系统钥匙串按当前账户保存 Key，不把明文写入项目目录或 Rime 配置文件。
 - 只会发送离线词典仍然缺失的短词，不发送应用正文、此前上屏内容或完整输入历史。
 - 翻译结果缓存在本机，已有结果不会重复请求。
 - 未配置 API 时，中文输入和离线双语释义仍可正常使用。
@@ -101,9 +101,9 @@ inputeng/
 - Windows 版是小狼毫扩展，不是独立 TSF 输入法。
 - 小狼毫会按同页最长中文候选统一放置英文注释列，当前配置不能让每一行完全独立紧贴。
 - Rime Lua 无法在没有新按键事件时主动重绘已经打开的候选页，因此后台补齐的 AI 释义会在下一次候选刷新时出现。
-- macOS 版尚未完成真实设备验收，暂不承诺与 Windows 版功能完全一致。
+- macOS 与 Windows 已共用相同的 Rime 核心文件和词典；macOS 真实设备的安装、候选视觉与快捷键体验仍待最终验收。
+- Windows 和 macOS 都是官方 Rime 前端的扩展，不是独立系统输入法；系统前端层面的名称、图标或全局外观可能同时影响同一前端里的其他 Rime 方案。
 
 ## 参与开发
 
 欢迎提交 Issue 或 Pull Request。提交前请运行 Windows 包校验，并确保没有提交 API Key、缓存、个人词频或其他本机数据。
-

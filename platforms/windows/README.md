@@ -2,9 +2,9 @@
 
 ## 状态
 
-小狼毫 / Rime 扩展 v0.5.9 已在 Windows 10 + 小狼毫 0.17.4 开发，并通过自动安装包验证和真实 librime C API 验证。
+小狼毫 / Rime 扩展 v0.6.0 已在 Windows + 小狼毫 0.17.4 开发，并通过自动安装包验证和真实 librime C API 验证。
 
-发布包：`dist/windows/inputeng-windows-v0.5.9.zip`
+发布包：`dist/windows/inputeng-windows-v0.6.0.zip`
 
 SHA-256：`29c1d2bf5ef1d7482503309d1e6605653625d94e373d5c6212d0f9a1d5edc4d6`
 
@@ -27,6 +27,8 @@ SHA-256：`29c1d2bf5ef1d7482503309d1e6605653625d94e373d5c6212d0f9a1d5edc4d6`
 - 候选缺词先写入本机队列，PowerShell worker 等待队列稳定约 500 ms 后批量调用用户配置的 DeepSeek API。
 - Lua filter 每秒最多检查一次缓存版本；网络请求不会阻塞 Rime 候选生成线程。
 - API Key 由 Windows DPAPI 按当前账户加密，缓存保存在 Rime 用户目录。
+- 全新电脑的无人值守安装必须显式传入 `-InstallWeasel -AcceptWeaselDownload -SilentWeaselInstall`；固定下载 URL、版本和 SHA-256 不变。
+- 系统品牌只改写小狼毫共用 TSF profile。安装器广播设置变更，但若 Windows 仍显示缓存的“小狼毫”，会明确要求注销后重新登录，而不是误报可见状态已刷新。
 - Rime Lua 无法从外部 worker 主动重绘静止的现有候选页，因此异步结果在下一次候选刷新时出现。商业输入法通常由原生候选 UI 持有异步服务回调，收到云端结果后直接更新当前候选模型。
 
 ## 目录

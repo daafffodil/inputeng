@@ -1,4 +1,4 @@
-# inputeng for Windows v0.5.9
+# inputeng for Windows v0.6.0
 
 普通简体拼音输入，中文候选旁显示简短英文释义；选择候选后只上屏中文。输入 `translate` 这类不能完整解析为拼音的英文时，英文候选旁显示中文小字，选择后只上屏英文。
 
@@ -15,6 +15,8 @@
 - AI 开启后，候选停止变化约 500 ms 才批量翻译本地缺词，避免在连续打字时发请求。
 - `F4` 直接在 **inputeng 全拼** 与 **inputeng 搜狗双拼** 之间切换，不再先打开方案菜单；`Ctrl+反引号` 仍保留小狼毫完整方案菜单。
 - 多片段组合第一次成功上屏后立即写入个人短语层，下次输入即可命中。
+- 修正全新电脑的自动化安装：`-NonInteractive` 不再停在 `Read-Host`；只有调用者同时明确传入 `-InstallWeasel -AcceptWeaselDownload -SilentWeaselInstall` 时，才会下载、校验并静默安装固定版小狼毫。
+- Windows 输入法名称和 E 图标写入后不再被安装器误报为“已经在切换器中即时生效”。TSF/Shell 可能保留旧缓存；若 `Win + Space` 仍显示“小狼毫”，注销当前 Windows 账户并重新登录即可刷新。
 
 ## 安装
 
@@ -25,7 +27,16 @@
 5. 从开始菜单打开 **inputeng 设置**，可调整外观、查看词库说明或配置 AI 翻译。
 6. 如需自动补齐离线词典没有的词，从开始菜单打开 **配置 DeepSeek**，粘贴自己的 API Key。
 
-通常不需要重启或退出 Windows 账户；安装脚本会自动重新部署小狼毫。
+输入方案和候选翻译通常不需要重启即可使用。Windows 的输入法名称与 E 图标由整个小狼毫 TSF profile 共用；若 `Win + Space` 仍显示旧名称或图标，请注销当前 Windows 账户并重新登录。
+
+无人值守且电脑尚未安装小狼毫时，可由调用者明确授权：
+
+```powershell
+powershell -ExecutionPolicy Bypass -File .\install.ps1 `
+  -NonInteractive -InstallWeasel -AcceptWeaselDownload -SilentWeaselInstall
+```
+
+安装器只下载固定的官方小狼毫 0.17.4，并核对随项目固定的 SHA-256。该上游安装包没有有效 Authenticode 签名，Windows 可能显示“未知发布者”；这不是 inputeng 的签名。
 
 ## 数据与隐私
 
@@ -39,6 +50,7 @@
 ## 已知边界
 
 - 本版依赖官方小狼毫，不是独立 Windows TSF 输入法。
+- inputeng 与其他 Rime 方案共用小狼毫的系统 TSF profile；系统级名称和 E 图标会作用于该小狼毫实例中的所有方案。`installation.yaml` 的发行信息仍属于上游小狼毫，inputeng 不会篡改它。
 - 英文释义只保留一个常用短义项，最长约 24 个英文字符，不等同于完整词典释义页。
 - Rime Lua 不能在没有新按键事件时主动重绘已经打开的候选页。后台会在停顿约 500 ms 后完成翻译；结果会在下一次候选刷新时出现。若要在同一静止候选页内即时更新，需要维护能接收异步回调的原生小狼毫前端或 librime 服务层。
 - 官方小狼毫会按同页最长中文候选统一放置英文注释列；若要逐条严格紧跟中文长度，也需要修改原生候选渲染器。

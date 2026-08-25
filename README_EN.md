@@ -10,7 +10,7 @@ inputeng is a Simplified Chinese input scheme built on Rime. Chinese candidates 
 
 ![inputeng candidate window](docs/assets/inputeng-preview.png)
 
-> The Windows build has been validated with Weasel and a real librime runtime. The macOS build is still an experimental preview awaiting validation on a real Mac.
+> The Windows build has been validated with Weasel and a real librime runtime. macOS now uses the same core features and passes installation/script tests on a macOS GitHub runner; final visual and typing acceptance on a real Mac is still pending.
 
 ## Features
 
@@ -28,24 +28,24 @@ inputeng is a Simplified Chinese input scheme built on Rime. Chinese candidates 
 
 [Download the latest release](https://github.com/daafffodil/inputeng/releases/latest)
 
-1. Download and fully extract `inputeng-windows-v0.5.9.zip`.
+1. Download and fully extract `inputeng-windows-v0.6.0.zip`.
 2. Double-click `install.cmd`.
 3. If Weasel is missing, the installer can download a pinned official build from Rime's GitHub release and verify its SHA-256 checksum.
 4. Select **inputeng** in the Windows input method list.
 5. Open **inputeng Settings** from the Start menu to adjust appearance, inspect dictionary information, or configure AI translation.
 
-A Windows sign-out is normally unnecessary. Run `uninstall.cmd` to remove the managed inputeng files. The uninstaller does not remove Weasel or the user's learned phrases.
+The input scheme normally works without signing out. Because inputeng shares Weasel's TSF profile with other Rime schemes, Windows may keep the old “Weasel” name or icon cached; the installer now explicitly asks the user to sign out and back in when that happens. Run `uninstall.cmd` to remove the managed inputeng files. The uninstaller does not remove Weasel or learned phrases.
 
-### Experimental macOS build
+### macOS
 
-The macOS build requires Squirrel with `librime-lua`. It currently provides offline Chinese-to-English annotations only and has not yet been validated on a real Mac. See the [macOS instructions](platforms/macos-rime/README.md).
+The macOS v0.6.0 build requires a recent official Squirrel release. It shares the same Chinese core, bidirectional offline dictionaries, full/Sogou Double Pinyin schemas, F4 toggle, personal phrase learning, and optional DeepSeek fallback as Windows. Its API key is stored in the macOS Keychain. See the [macOS instructions](platforms/macos-rime/README.md).
 
 ## AI translation and API keys
 
 AI translation is optional. **No maintainer API key or shared API key is included in the repository or release archives.**
 
 - Every user supplies their own DeepSeek API key locally.
-- On Windows, the key is encrypted for the current account with DPAPI. Plaintext is not written to the project or Rime configuration files.
+- Windows uses per-account DPAPI and macOS uses the system Keychain. Plaintext is not written to the project or Rime configuration files.
 - Only short terms that are still missing from the offline dictionaries are sent. Application text, previous commits, and full input history are not sent.
 - Results are cached locally to avoid duplicate requests.
 - Without an API key, Chinese input and offline bilingual annotations continue to work normally.
@@ -101,9 +101,9 @@ inputeng/
 - The Windows build is a Weasel extension, not a standalone TSF input method.
 - Weasel aligns annotations after the longest Chinese candidate on a page; the current configuration cannot independently attach every gloss at a different horizontal position.
 - Rime Lua cannot redraw an already open candidate page without a new input event. An asynchronous AI result therefore appears on the next candidate refresh.
-- The macOS build has not yet completed real-device acceptance testing and does not currently claim feature parity with Windows.
+- macOS and Windows now share the same Rime core files and dictionaries. Final real-device validation of macOS installation, candidate visuals, and shortcut behavior is still pending.
+- Both builds extend an official Rime frontend rather than implementing an independent system IME. Frontend-wide branding or appearance settings can also affect other schemes hosted by the same Weasel or Squirrel instance.
 
 ## Contributing
 
 Issues and pull requests are welcome. Before submitting, run the Windows package validation and make sure no API keys, caches, personal frequency data, or other machine-local data are included.
-

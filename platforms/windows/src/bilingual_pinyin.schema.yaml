@@ -8,7 +8,7 @@ __include: luna_pinyin_simp.schema:/
 schema:
   schema_id: bilingual_pinyin
   name: inputeng
-  version: "0.5.9"
+  version: "0.6.0"
   author:
     - inputeng contributors
   description: |

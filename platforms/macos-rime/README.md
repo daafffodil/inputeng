@@ -1,34 +1,26 @@
 # inputeng / macOS Rime
 
-## 目标
+## 状态
 
-在 macOS 的鼠须管输入法中，为普通简体拼音候选追加统一短英文释义；保持中文候选的上屏内容、排序和输入习惯不变。
+鼠须管扩展 v0.6.0。macOS 与 Windows 现在共用同一套核心方案、173,035 条简体中文词库、双向离线释义、个人短语学习和 DeepSeek 缺词队列；平台差异只保留在安装、外观设置、密钥存储和后台 worker。
 
-## MVP 结构
+发布包：`dist/macos/inputeng-macos-v0.6.0.zip`
 
-- `src/bilingual_pinyin.schema.yaml`：基于鼠须管自带的朙月拼音简体方案。
-- `src/lua/bilingual_comment.lua`：按候选文本查询本地 TSV，并只修改候选 `comment`。
-- `scripts/build_dictionary.py`：把 CC-CEDICT 转换成适合候选窗口的短释义。
-- `src/install.sh`、`src/uninstall.sh`：Mac 安装和卸载脚本。
-- `package/`：由构建脚本生成的临时目录，不提交到 Git。
-- `dist/`：最终可交付 ZIP。
+## 架构
 
-## 构建词典
+- Rime 的 engine、translators、filters、词典与 Lua 从 `platforms/windows/src/` 共用；打包时只去掉 Weasel 专用的候选窗 `style` 段，改由鼠须管全局外观补丁管理。
+- `scripts/package.py` 调用同一套运行时词典生成逻辑，生成相同的中译英表，并复制共享英译中表。
+- `src/install.sh` 使用鼠须管自带的 `rime_deployer --add-schema` 安全加入全拼和搜狗双拼。
+- `src/helper/worker.sh` 由用户级 LaunchAgent 定时运行；网络请求在 Rime 进程外执行。
+- `src/helper/worker-json.js` 使用 macOS 自带 JXA 生成和解析 JSON，不要求 Homebrew、Node.js 或 Python。
+- API Key 使用 macOS Keychain 保存；配置和缓存不进入仓库或发布包。
+- `src/settings.command` 提供 macOS 原生对话框式设置入口。
+
+## 构建与验证
 
 ```powershell
-python scripts/build_dictionary.py cedict_1_0_ts_utf-8_mdbg.txt.gz ../../shared/dictionary/bilingual_english.tsv
-python scripts/package.py
+python platforms/macos-rime/scripts/package.py
+python platforms/macos-rime/scripts/test_package.py
 ```
 
-`package.py` 会把共享词典和最新源码同步到安装包暂存目录，再把 ZIP 输出到项目根目录的 `dist/macos/`。
-
-## MVP 边界
-
-- 当前 Mac 安装包不启用 AI 或在线翻译；Lua 已兼容以后加入本机后台缓存。
-- 不翻译没有完整命中词典的长句。
-- 不修改鼠须管源码和候选窗口样式。
-- 首轮需要在真实 Mac 上验证安装、部署和显示效果。
-
-## 后续候选功能（暂不开发）
-
-- 本地统计用户实际上屏的中文词语及词频。实现时应监听 Rime 的真实上屏／提交事件，而不是只统计空格键，以免漏掉数字键、回车或鼠标选词；统计数据只保存在用户 Mac 本地。
+GitHub Actions 在 `macos-latest` 上执行 shell 语法、JXA 自检、YAML、安装/卸载隔离测试和 ZIP 权限验证。真实输入体验仍需在安装了鼠须管的 Mac 上验收。
