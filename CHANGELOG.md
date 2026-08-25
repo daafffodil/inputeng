@@ -1,5 +1,11 @@
 # Changelog
 
+## v0.6.1
+
+- Stopped applying Windows TSF name/icon branding during normal installation, avoiding an unnecessary administrator prompt and global changes shared by every Weasel scheme.
+- Removed the Windows sign-out/sign-in prompt; seeing the upstream Weasel name or icon in the system input list is now treated as harmless.
+- Preserved older branding metadata during upgrades so uninstall can still restore changes made by v0.6.0 or earlier.
+
 ## v0.6.0
 
 - Brought macOS to core feature parity with Windows: the same curated Simplified Chinese dictionary, bidirectional offline glosses, full/Sogou Double Pinyin, F4 switching, first-commit phrase learning, and optional DeepSeek fallback.

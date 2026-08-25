@@ -292,9 +292,13 @@ def validate_yaml_and_lua() -> None:
     assert "[switch]$InstallWeasel" in installer
     assert "[switch]$AcceptWeaselDownload" in installer
     assert "[switch]$SilentWeaselInstall" in installer
+    assert "[switch]$ApplySystemBranding" in installer
     assert "-NonInteractive -InstallWeasel -AcceptWeaselDownload -SilentWeaselInstall" not in installer
     assert "Windows 输入法列表名称：inputeng；图标：E。" not in installer
-    assert "注销当前 Windows 账户并重新登录" in installer
+    assert "注销当前 Windows 账户并重新登录" not in installer
+    assert "mayRequireSignOut" not in installer
+    assert "if ($ApplySystemBranding -and -not $SkipBranding" in installer
+    assert "v0.6.1 no longer changes Weasel's shared Windows language-profile" in installer
     icon = (PACKAGE_ROOT / "branding" / "inputeng.ico").read_bytes()
     assert icon[:6] == b"\x00\x00\x01\x00\x08\x00", icon[:6]
 

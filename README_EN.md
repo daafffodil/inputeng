@@ -28,17 +28,17 @@ inputeng is a Simplified Chinese input scheme built on Rime. Chinese candidates 
 
 [Download the latest release](https://github.com/daafffodil/inputeng/releases/latest)
 
-1. Download and fully extract `inputeng-windows-v0.6.0.zip`.
+1. Download and fully extract `inputeng-windows-v0.6.1.zip`.
 2. Double-click `install.cmd`.
 3. If Weasel is missing, the installer can download a pinned official build from Rime's GitHub release and verify its SHA-256 checksum.
-4. Select **inputeng** in the Windows input method list.
+4. Select **Weasel** in the Windows input method list; the inputeng scheme is enabled inside it.
 5. Open **inputeng Settings** from the Start menu to adjust appearance, inspect dictionary information, or configure AI translation.
 
-The input scheme normally works without signing out. Because inputeng shares Weasel's TSF profile with other Rime schemes, Windows may keep the old “Weasel” name or icon cached; the installer now explicitly asks the user to sign out and back in when that happens. Run `uninstall.cmd` to remove the managed inputeng files. The uninstaller does not remove Weasel or learned phrases.
+Starting with v0.6.1, the installer no longer changes Weasel's shared Windows system name or icon by default and never asks the user to sign out just to refresh branding. Seeing “Weasel” in `Win + Space` is expected and does not affect the inputeng scheme, candidate annotations, or settings. Run `uninstall.cmd` to remove the managed inputeng files. The uninstaller does not remove Weasel or learned phrases.
 
 ### macOS
 
-The macOS v0.6.0 build requires a recent official Squirrel release. It shares the same Chinese core, bidirectional offline dictionaries, full/Sogou Double Pinyin schemas, F4 toggle, personal phrase learning, and optional DeepSeek fallback as Windows. Its API key is stored in the macOS Keychain. See the [macOS instructions](platforms/macos-rime/README.md).
+The macOS v0.6.1 build requires a recent official Squirrel release. It shares the same Chinese core, bidirectional offline dictionaries, full/Sogou Double Pinyin schemas, F4 toggle, personal phrase learning, and optional DeepSeek fallback as Windows. Its API key is stored in the macOS Keychain. See the [macOS instructions](platforms/macos-rime/README.md).
 
 ## AI translation and API keys
 
@@ -102,7 +102,7 @@ inputeng/
 - Weasel aligns annotations after the longest Chinese candidate on a page; the current configuration cannot independently attach every gloss at a different horizontal position.
 - Rime Lua cannot redraw an already open candidate page without a new input event. An asynchronous AI result therefore appears on the next candidate refresh.
 - macOS and Windows now share the same Rime core files and dictionaries. Final real-device validation of macOS installation, candidate visuals, and shortcut behavior is still pending.
-- Both builds extend an official Rime frontend rather than implementing an independent system IME. Frontend-wide branding or appearance settings can also affect other schemes hosted by the same Weasel or Squirrel instance.
+- Both builds extend an official Rime frontend rather than implementing an independent system IME. The system input list may therefore keep the upstream Weasel or Squirrel name and icon.
 
 ## Contributing
 

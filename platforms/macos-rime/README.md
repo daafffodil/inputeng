@@ -2,9 +2,9 @@
 
 ## 状态
 
-鼠须管扩展 v0.6.0。macOS 与 Windows 现在共用同一套核心方案、173,035 条简体中文词库、双向离线释义、个人短语学习和 DeepSeek 缺词队列；平台差异只保留在安装、外观设置、密钥存储和后台 worker。
+鼠须管扩展 v0.6.1。macOS 与 Windows 现在共用同一套核心方案、173,035 条简体中文词库、双向离线释义、个人短语学习和 DeepSeek 缺词队列；平台差异只保留在安装、外观设置、密钥存储和后台 worker。
 
-发布包：`dist/macos/inputeng-macos-v0.6.0.zip`
+发布包：`dist/macos/inputeng-macos-v0.6.1.zip`
 
 ## 架构
 

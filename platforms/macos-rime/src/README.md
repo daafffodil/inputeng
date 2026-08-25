@@ -1,4 +1,4 @@
-# inputeng for macOS v0.6.0
+# inputeng for macOS v0.6.1
 
 macOS 版现在与 Windows 版共用同一套 Rime 核心、中文词库、双向离线词典和 Lua 行为。鼠须管只负责 macOS 候选窗口与上屏。
 

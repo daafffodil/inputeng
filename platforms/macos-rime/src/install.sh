@@ -133,7 +133,7 @@ if [ "${INPUTENG_SKIP_RELOAD:-0}" != "1" ] && [ -x "${SQUIRREL_BIN}" ]; then
 fi
 
 echo
-echo "inputeng 0.6.0 已安装到：${RIME_DIR}"
+echo "inputeng 0.6.1 已安装到：${RIME_DIR}"
 echo "全拼和搜狗双拼已启用；按 F4 可直接切换。"
 echo "设置入口：${STATE_ROOT}/settings.command"
 echo "也可以在终端运行：open \"${STATE_ROOT}/settings.command\""

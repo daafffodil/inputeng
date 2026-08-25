@@ -6,6 +6,7 @@ param(
     [switch]$SkipDeploy,
     [switch]$SkipBackgroundWorker,
     [switch]$SkipBranding,
+    [switch]$ApplySystemBranding,
     [switch]$InstallWeasel,
     [switch]$AcceptWeaselDownload,
     [switch]$SilentWeaselInstall,
@@ -16,7 +17,7 @@ $ErrorActionPreference = 'Stop'
 Set-StrictMode -Version 2.0
 
 $ProductName = 'inputeng'
-$ProductVersion = '0.6.0'
+$ProductVersion = '0.6.1'
 $WeaselVersion = '0.17.4'
 $WeaselInstallerName = 'weasel-0.17.4.0-installer.exe'
 $WeaselInstallerUrl = 'https://github.com/rime/weasel/releases/download/0.17.4/weasel-0.17.4.0-installer.exe'
@@ -748,19 +749,42 @@ if (-not $SkipBackgroundWorker) {
 }
 
 $branding = $null
-if (-not $SkipWeaselCheck -and (Test-InputEngBrandingRegistry)) {
-    $branding = [ordered]@{
-        applied = $true
-        name = 'inputeng'
-        icon = 'E'
-        helperPath = (Join-Path $StateRoot 'helper\brand-weasel.ps1')
-        mayRequireSignOut = $true
+# v0.6.1 no longer changes Weasel's shared Windows language-profile name or
+# icon by default. Keep an earlier manifest entry so uninstall can still
+# restore branding applied by v0.6.0 or older releases.
+if ($null -ne $OldManifest) {
+    $oldBrandingProperty = $OldManifest.PSObject.Properties['branding']
+    if ($null -ne $oldBrandingProperty -and $null -ne $oldBrandingProperty.Value) {
+        $oldBranding = $oldBrandingProperty.Value
+        if ([bool]$oldBranding.applied) {
+            $branding = [ordered]@{
+                applied = $true
+                name = [string]$oldBranding.name
+                icon = [string]$oldBranding.icon
+                helperPath = [string]$oldBranding.helperPath
+            }
+        }
     }
-} elseif (-not $SkipBranding -and -not $SkipWeaselCheck) {
-    try {
-        $branding = Install-InputEngBranding
-    } catch {
-        Write-Warning "inputeng 名称和 E 图标未能应用：$($_.Exception.Message)"
+}
+
+# Retain an explicit compatibility switch for maintainers, but never make
+# system-profile branding or a Windows sign-out part of the normal install.
+if ($ApplySystemBranding -and -not $SkipBranding -and -not $SkipWeaselCheck) {
+    if (Test-InputEngBrandingRegistry) {
+        if ($null -eq $branding) {
+            $branding = [ordered]@{
+                applied = $true
+                name = 'inputeng'
+                icon = 'E'
+                helperPath = (Join-Path $StateRoot 'helper\brand-weasel.ps1')
+            }
+        }
+    } else {
+        try {
+            $branding = Install-InputEngBranding
+        } catch {
+            Write-Warning "可选的 Windows 系统名称和图标未能应用；inputeng 输入功能不受影响。$($_.Exception.Message)"
+        }
     }
 }
 
@@ -801,8 +825,4 @@ if (-not $SkipDeploy) {
 if (-not $SkipBackgroundWorker) {
 Write-Host '外观、词库与 AI 翻译设置入口：开始菜单 → inputeng → inputeng 设置。'
     Write-Host 'DeepSeek 缺词补全入口：开始菜单 → inputeng → 配置 DeepSeek。'
-}
-if ($null -ne $branding) {
-    Write-Host 'inputeng 名称和 E 图标已写入 Windows 语言配置。' -ForegroundColor Green
-    Write-Warning 'Windows 可能继续显示已缓存的“小狼毫”名称或旧图标。若 Win + Space 未立即更新，请注销当前 Windows 账户并重新登录；安装器不会强制结束 ctfmon.exe、TextInputHost.exe 或 explorer.exe。'
 }

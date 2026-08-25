@@ -9,7 +9,7 @@ __include: luna_pinyin_simp.schema:/
 schema:
   schema_id: bilingual_sogou
   name: inputeng 搜狗双拼
-  version: "0.6.0"
+  version: "0.6.1"
   author:
     - inputeng contributors
   description: |
