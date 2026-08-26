@@ -31,6 +31,8 @@ def count_tsv(path: Path) -> int:
 def validate_core_parity() -> None:
     same_files = [
         "input_translate_core.dict.yaml",
+        "inputeng_annotations.schema.yaml",
+        "inputeng_english.schema.yaml",
         "cn_dicts/8105.dict.yaml",
         "cn_dicts/base.dict.yaml",
         "cn_dicts/modern.dict.yaml",
@@ -53,8 +55,10 @@ def validate_core_parity() -> None:
         assert schema["schema"]["name"].startswith("inputeng")
         assert "style" not in schema
 
-    assert count_tsv(PACKAGE_ROOT / "bilingual_english.tsv") == 59872
+    assert count_tsv(PACKAGE_ROOT / "bilingual_english.tsv") == 59873
     assert count_tsv(PACKAGE_ROOT / "english_chinese.tsv") == 58129
+    assert count_tsv(PACKAGE_ROOT / "inputeng_annotations.dict.yaml") > 110_000
+    assert count_tsv(PACKAGE_ROOT / "inputeng_english.dict.yaml") > 50_000
 
 
 def validate_scripts() -> None:
@@ -85,6 +89,10 @@ def validate_archive() -> None:
         PREFIX + "configure-deepseek.command",
         PREFIX + "bilingual_pinyin.schema.yaml",
         PREFIX + "bilingual_sogou.schema.yaml",
+        PREFIX + "inputeng_annotations.schema.yaml",
+        PREFIX + "inputeng_annotations.dict.yaml",
+        PREFIX + "inputeng_english.schema.yaml",
+        PREFIX + "inputeng_english.dict.yaml",
         PREFIX + "english_chinese.tsv",
         PREFIX + "helper/worker.sh",
         PREFIX + "helper/worker-json.js",

@@ -8,7 +8,11 @@ __include: luna_pinyin_simp.schema:/
 schema:
   schema_id: bilingual_pinyin
   name: inputeng
-  version: "0.6.1"
+  version: "0.6.2"
+  dependencies:
+    - stroke
+    - inputeng_annotations
+    - inputeng_english
   author:
     - inputeng contributors
   description: |
@@ -17,10 +21,10 @@ schema:
 
 # The scheme displays Simplified Chinese only. The lookup table also contains
 # Traditional aliases for Rime's underlying genuine candidate text.
-# ShadowCandidate changes only the visible comment.
+# Native reverse lookup fills the offline comment; ShadowCandidate is used only
+# when the local DeepSeek cache has a newer result.
 engine:
   processors:
-    - lua_processor@*schema_toggle_processor
     - ascii_composer
     - recognizer
     - key_binder
@@ -28,13 +32,11 @@ engine:
     - punctuator
     - selector
     - navigator
-    - lua_processor@*personal_phrase_processor
     - express_editor
   translators:
     - punct_translator
     - reverse_lookup_translator
-    - lua_translator@*english_comment_translator
-    - lua_translator@*personal_phrase_translator
+    - table_translator@english
     - script_translator
   filters:
     # Weasel 0.17.4 bundles Luna Pinyin 0.22, whose Simplified schema uses
@@ -42,9 +44,24 @@ engine:
     # to the newer `zh_hans` namespace leaves the filter unconfigured and
     # therefore produces Traditional candidates.
     - simplifier
-    - lua_filter@*english_mode_filter
+    - reverse_lookup_filter@inputeng_annotations
     - lua_filter@*bilingual_comment
     - uniquifier
+
+english:
+  dictionary: inputeng_english
+  prism: inputeng_english
+  enable_completion: false
+  enable_sentence: false
+  enable_user_dict: false
+  initial_quality: 100
+
+inputeng_annotations:
+  tags: [abc]
+  dictionary: inputeng_annotations
+  overwrite_comment: true
+  comment_format:
+    - xform/_/ /
 
 translator:
   dictionary: input_translate_core
@@ -63,6 +80,11 @@ speller:
   # Luna Pinyin normally renders completed syllables with spaces. Keep a
   # single apostrophe as the visible and manually typable separator instead.
   delimiter: "'"
+
+key_binder:
+  import_preset: default
+  bindings:
+    - { when: always, accept: F4, select: .next }
 
 # Keep every page at five logical slots. Weasel normally shrinks the window
 # when an English query or a rare spelling yields fewer candidates.

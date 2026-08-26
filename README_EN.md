@@ -28,7 +28,7 @@ inputeng is a Simplified Chinese input scheme built on Rime. Chinese candidates 
 
 [Download the latest release](https://github.com/daafffodil/inputeng/releases/latest)
 
-1. Download and fully extract `inputeng-windows-v0.6.1.zip`.
+1. Download and fully extract `inputeng-windows-v0.6.2.zip`.
 2. Double-click `install.cmd`.
 3. If Weasel is missing, the installer can download a pinned official build from Rime's GitHub release and verify its SHA-256 checksum.
 4. Select **Weasel** in the Windows input method list; the inputeng scheme is enabled inside it.
@@ -38,7 +38,11 @@ Starting with v0.6.1, the installer no longer changes Weasel's shared Windows sy
 
 ### macOS
 
-The macOS v0.6.1 build requires a recent official Squirrel release. It shares the same Chinese core, bidirectional offline dictionaries, full/Sogou Double Pinyin schemas, F4 toggle, personal phrase learning, and optional DeepSeek fallback as Windows. Its API key is stored in the macOS Keychain. See the [macOS instructions](platforms/macos-rime/README.md).
+The macOS v0.6.2 build requires a recent official Squirrel release. It shares the same optimized Chinese core, native bidirectional offline annotations, full/Sogou Double Pinyin schemas, F4 toggle, first-commit phrase learning, and optional DeepSeek fallback as Windows. Its API key is stored in the macOS Keychain. See the [macOS instructions](platforms/macos-rime/README.md).
+
+## v0.6.2 input-latency optimization
+
+Offline annotations, direct English input, F4 switching, and phrase learning now use native librime components. Only one lightweight Lua filter remains on the per-key path to read the AI cache; Lua no longer loads and searches roughly 59k offline glosses while typing. In an isolated Windows + Weasel 0.17.4 benchmark, median per-key processing fell from about 8.86 ms to 0.32 ms, and p95 fell from about 17.13 ms to 1.19 ms.
 
 ## AI translation and API keys
 
@@ -52,8 +56,8 @@ AI translation is optional. **No maintainer API key or shared API key is include
 
 ## Dictionaries
 
-- Chinese core: 173,035 entries. The base is a filtered Simplified Chinese subset of [Rime Ice](https://github.com/iDvel/rime-ice), plus standard character readings.
-- Chinese to English: 59,872 short glosses transformed from [CC-CEDICT](https://www.mdbg.net/chinese/dictionary?page=cc-cedict).
+- Chinese core: 173,036 entries. The base is a filtered Simplified Chinese subset of [Rime Ice](https://github.com/iDvel/rime-ice), plus standard character readings.
+- Chinese to English: 59,873 short glosses transformed from [CC-CEDICT](https://www.mdbg.net/chinese/dictionary?page=cc-cedict).
 - English to Chinese: 58,129 common-word glosses derived from [ECDICT](https://github.com/skywind3000/ECDICT).
 
 See [THIRD_PARTY_NOTICES.md](THIRD_PARTY_NOTICES.md) for provenance, modifications, attribution, and licenses. Project code is MIT-licensed; third-party dictionary data remains under its respective license.
@@ -81,6 +85,7 @@ The full Windows candidate smoke test additionally requires a local loadable lib
 
 ```powershell
 python platforms/windows/scripts/smoke_rime.py
+python platforms/windows/scripts/benchmark_rime.py --max-p95-ms 5
 ```
 
 ## Repository layout

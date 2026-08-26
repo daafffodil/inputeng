@@ -9,7 +9,10 @@ __include: luna_pinyin_simp.schema:/
 schema:
   schema_id: bilingual_sogou
   name: inputeng 搜狗双拼
-  version: "0.6.1"
+  version: "0.6.2"
+  dependencies:
+    - stroke
+    - inputeng_annotations
   author:
     - inputeng contributors
   description: |
@@ -18,7 +21,6 @@ schema:
 
 engine:
   processors:
-    - lua_processor@*schema_toggle_processor
     - ascii_composer
     - recognizer
     - key_binder
@@ -26,17 +28,23 @@ engine:
     - punctuator
     - selector
     - navigator
-    - lua_processor@*personal_phrase_processor
     - express_editor
   translators:
     - punct_translator
     - reverse_lookup_translator
-    - lua_translator@*personal_phrase_translator
     - script_translator
   filters:
     - simplifier
+    - reverse_lookup_filter@inputeng_annotations
     - lua_filter@*bilingual_comment
     - uniquifier
+
+inputeng_annotations:
+  tags: [abc]
+  dictionary: inputeng_annotations
+  overwrite_comment: true
+  comment_format:
+    - xform/_/ /
 
 speller:
   alphabet: zyxwvutsrqponmlkjihgfedcba
@@ -74,6 +82,11 @@ speller:
     - xform/in$/Ⓝ/
     - xform/ing$/;/
     - xlit/ⓆⓌⓇⓉⓎⓊⒾⓄⓅⓈⒹⒻⒼⒽⓂⒿⒸⓀⓁⓏⓍⓋⒷⓃ/qwrtyuiopsdfghmjcklzxvbn/
+
+key_binder:
+  import_preset: default
+  bindings:
+    - { when: always, accept: F4, select: .next }
 
 translator:
   dictionary: input_translate_core

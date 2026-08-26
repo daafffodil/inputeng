@@ -57,6 +57,8 @@ def main() -> None:
     # settings helpers remain under their own source trees.
     for name in ("bilingual_pinyin.schema.yaml", "bilingual_sogou.schema.yaml"):
         write_macos_schema(WINDOWS_SOURCE_ROOT / name, PACKAGE_ROOT / name)
+    for name in ("inputeng_annotations.schema.yaml", "inputeng_english.schema.yaml"):
+        shutil.copy2(WINDOWS_SOURCE_ROOT / name, PACKAGE_ROOT / name)
     shutil.copy2(
         WINDOWS_SOURCE_ROOT / "input_translate_core.dict.yaml",
         PACKAGE_ROOT / "input_translate_core.dict.yaml",
@@ -82,6 +84,7 @@ def main() -> None:
 
     shutil.copy2(GLOSS_OVERRIDES, PACKAGE_ROOT / "common_gloss_overrides.tsv")
     shutil.copy2(ENGLISH_CHINESE, PACKAGE_ROOT / "english_chinese.tsv")
+    windows_package.write_native_rime_dictionaries(PACKAGE_ROOT)
     shutil.copy2(PROJECT_ROOT / "VERSION", PACKAGE_ROOT / "VERSION")
     shutil.copy2(UNIFIED_ROOT / "LICENSE", PACKAGE_ROOT / "LICENSE")
     shutil.copy2(UNIFIED_ROOT / "THIRD_PARTY_NOTICES.md", PACKAGE_ROOT / "THIRD_PARTY_NOTICES.md")

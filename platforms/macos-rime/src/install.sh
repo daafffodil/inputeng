@@ -45,6 +45,10 @@ record_original() {
 
 managed_files='bilingual_pinyin.schema.yaml
 bilingual_sogou.schema.yaml
+inputeng_annotations.schema.yaml
+inputeng_annotations.dict.yaml
+inputeng_english.schema.yaml
+inputeng_english.dict.yaml
 input_translate_core.dict.yaml
 cn_dicts/8105.dict.yaml
 cn_dicts/base.dict.yaml
@@ -133,7 +137,7 @@ if [ "${INPUTENG_SKIP_RELOAD:-0}" != "1" ] && [ -x "${SQUIRREL_BIN}" ]; then
 fi
 
 echo
-echo "inputeng 0.6.1 已安装到：${RIME_DIR}"
+echo "inputeng 0.6.2 已安装到：${RIME_DIR}"
 echo "全拼和搜狗双拼已启用；按 F4 可直接切换。"
 echo "设置入口：${STATE_ROOT}/settings.command"
 echo "也可以在终端运行：open \"${STATE_ROOT}/settings.command\""

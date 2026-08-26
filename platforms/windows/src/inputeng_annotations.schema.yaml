@@ -1,0 +1,22 @@
+# Rime schema
+# encoding: utf-8
+
+# Build-only dependency for the native exact-match bilingual comment table.
+__include: luna_pinyin_simp.schema:/
+
+schema:
+  schema_id: inputeng_annotations
+  name: inputeng bilingual annotation compiler
+  version: "0.6.2"
+
+engine:
+  translators:
+    - table_translator
+
+translator:
+  dictionary: inputeng_annotations
+  prism: inputeng_annotations
+  enable_user_dict: false
+
+speller:
+  alphabet: abcdefghijklmnopqrstuvwxyz_'-

@@ -27,11 +27,11 @@ PACKAGE_ROOT = PLATFORM_ROOT / "package"
 DIST_ROOT = PROJECT_ROOT / "dist" / "windows"
 VERSION = (PACKAGE_ROOT / "VERSION").read_text(encoding="utf-8").strip()
 ARCHIVE = DIST_ROOT / f"inputeng-windows-v{VERSION}.zip"
-EXPECTED_DICTIONARY_ENTRIES = 59_872
+EXPECTED_DICTIONARY_ENTRIES = 59_873
 EXPECTED_CHINESE_TABLES = {
     "cn_dicts/8105.dict.yaml": (8_757, "1f9a42b91dea6982baee2551981780271aeffd78876662b9c9f324e56b37b120"),
     "cn_dicts/base.dict.yaml": (164_199, "f7099c46c1567f2c330865bbe49976a1cfbbfdc10f9c4516d5d54dc0e2d0f235"),
-    "cn_dicts/modern.dict.yaml": (79, "30e38a6a374bb5ef1390ca09e9757c282b1e30e5e80f8091d4eaa538f13e0f72"),
+    "cn_dicts/modern.dict.yaml": (80, "74d23b271b9b13185698167fc6a31e135629b66dfdd72910b523a5dd095df1d9"),
 }
 
 
@@ -96,6 +96,7 @@ def validate_dictionary() -> None:
         "麻薯": "mochi",
         "臀桥": "glute bridge",
         "芋泥": "taro paste",
+        "弓箭步": "lunge",
     }
 
     english_entries = [
@@ -146,7 +147,7 @@ def validate_chinese_dictionary() -> None:
         all_rows.extend(rows)
 
     words = {row[0] for row in all_rows}
-    assert {"输入", "输入法", "翻译", "金枪鱼", "玫粉色", "松弛感", "显眼包", "臀推", "麻薯", "臀桥", "芋泥"}.issubset(words)
+    assert {"输入", "输入法", "翻译", "金枪鱼", "玫粉色", "松弛感", "显眼包", "臀推", "麻薯", "臀桥", "芋泥", "弓箭步"}.issubset(words)
     assert {"澍濡", "菽乳", "竖儒", "诱励", "雪鸮", "穴鸮", "雪下", "削下"}.isdisjoint(words)
     base_text = (PACKAGE_ROOT / "cn_dicts" / "base.dict.yaml").read_text(encoding="utf-8")
     assert "inputeng generated common subset" in base_text
@@ -160,12 +161,11 @@ def validate_yaml_and_lua() -> None:
     assert schema["schema"]["schema_id"] == "bilingual_pinyin"
     assert schema["engine"]["filters"] == [
         "simplifier",
-        "lua_filter@*english_mode_filter",
+        "reverse_lookup_filter@inputeng_annotations",
         "lua_filter@*bilingual_comment",
         "uniquifier",
     ]
     assert schema["engine"]["processors"] == [
-        "lua_processor@*schema_toggle_processor",
         "ascii_composer",
         "recognizer",
         "key_binder",
@@ -173,16 +173,19 @@ def validate_yaml_and_lua() -> None:
         "punctuator",
         "selector",
         "navigator",
-        "lua_processor@*personal_phrase_processor",
         "express_editor",
     ]
     assert schema["engine"]["translators"] == [
         "punct_translator",
         "reverse_lookup_translator",
-        "lua_translator@*english_comment_translator",
-        "lua_translator@*personal_phrase_translator",
+        "table_translator@english",
         "script_translator",
     ]
+    assert schema["schema"]["dependencies"] == ["stroke", "inputeng_annotations", "inputeng_english"]
+    assert schema["english"]["dictionary"] == "inputeng_english"
+    assert schema["english"]["prism"] == "inputeng_english"
+    assert schema["inputeng_annotations"]["dictionary"] == "inputeng_annotations"
+    assert schema["key_binder"]["bindings"] == [{"when": "always", "accept": "F4", "select": ".next"}]
     assert schema["translator"]["dictionary"] == "input_translate_core"
     assert schema["translator"]["user_dict"] == "input_translate_core"
     assert schema["translator"]["enable_sentence"] is True
@@ -209,9 +212,11 @@ def validate_yaml_and_lua() -> None:
     assert sogou["translator"]["user_dict"] == "input_translate_core_sogou"
     assert sogou["speller"]["delimiter"] == "'"
     assert "xform/ing$/;/" in sogou["speller"]["algebra"]
-    assert "lua_translator@*english_comment_translator" not in sogou["engine"]["translators"]
+    assert "table_translator@english" not in sogou["engine"]["translators"]
     assert "lua_filter@*bilingual_comment" in sogou["engine"]["filters"]
-    assert sogou["engine"]["processors"][0] == "lua_processor@*schema_toggle_processor"
+    assert "reverse_lookup_filter@inputeng_annotations" in sogou["engine"]["filters"]
+    assert sogou["engine"]["processors"][0] == "ascii_composer"
+    assert sogou["key_binder"]["bindings"][0]["accept"] == "F4"
     assert sogou["style"]["inline_preedit"] is True
 
     windows_lua = PACKAGE_ROOT / "lua" / "bilingual_comment.lua"
@@ -223,30 +228,19 @@ def validate_yaml_and_lua() -> None:
     bilingual_lua = windows_lua.read_text(encoding="utf-8")
     assert "RUNTIME_REFRESH_SECONDS = 1" in bilingual_lua
     assert "MISSING_BATCH_SIZE = 5" in bilingual_lua
-    assert "flush_pending_missing(env)" in bilingual_lua
-    assert "not file_exists(env.ai_enabled_path)" not in bilingual_lua
-    assert "common_gloss_overrides.tsv" in bilingual_lua
-    english_lua = (PACKAGE_ROOT / "lua" / "english_comment_translator.lua").read_text(encoding="utf-8")
-    assert "english_chinese.tsv" in english_lua
-    assert "is_full_pinyin" in english_lua
-    assert "has_incomplete_pinyin_tail" in english_lua
-    assert "PINYIN_PREFIXES" in english_lua
-    assert 'Candidate("english"' in english_lua
-    assert 'if not chinese or chinese == "" then\n    return\n  end' in english_lua
-    english_filter = (PACKAGE_ROOT / "lua" / "english_mode_filter.lua").read_text(encoding="utf-8")
-    assert 'candidate.type == "english"' in english_filter
-    processor = (PACKAGE_ROOT / "lua" / "personal_phrase_processor.lua").read_text(encoding="utf-8")
-    translator = (PACKAGE_ROOT / "lua" / "personal_phrase_translator.lua").read_text(encoding="utf-8")
-    assert "prior_selection_count >= 1" in processor
-    assert "append_phrase(env, code, text)" in processor
-    assert "input_translate_phrase_pending.tsv" in processor
-    assert "input_translate_frequency_events.tsv" not in processor
-    assert "input_translate_missing.txt" in processor
-    assert "record_commit(env, text)" in processor
-    assert "pending_code == code and pending_text == text" not in processor
-    assert "input_translate_personal_phrases.tsv" in processor
-    assert "candidate.quality = 1000 + index" in translator
-    assert "REFRESH_INTERVAL_SECONDS = 1" in translator
+    assert "flush(runtime)" in bilingual_lua
+    assert "input_translate_ai_cache.tsv" in bilingual_lua
+    assert "commit_notifier" in bilingual_lua
+    assert "bilingual_english.tsv" not in bilingual_lua
+    assert "common_gloss_overrides.tsv" not in bilingual_lua
+    assert 'candidate.type == "table"' in bilingual_lua
+
+    annotation_rows = rime_dictionary_rows(PACKAGE_ROOT / "inputeng_annotations.dict.yaml")
+    english_rows = rime_dictionary_rows(PACKAGE_ROOT / "inputeng_english.dict.yaml")
+    assert len(annotation_rows) > 110_000
+    assert len(english_rows) > 50_000
+    assert any(row[:2] == ["\u8f93\u5165\u6cd5", "input_method"] for row in annotation_rows)
+    assert any(row[:2] == ["translate", "translate"] for row in english_rows)
 
     settings = (PACKAGE_ROOT / "helper" / "settings.ps1").read_text(encoding="utf-8")
     assert "input_translate_frequency" not in settings
@@ -276,9 +270,7 @@ def validate_yaml_and_lua() -> None:
     assert 'Content="恢复默认"' in settings_ui
     assert "InlineRadio" not in settings_ui
     assert "状态：已启用" in settings_ui
-    toggle = (PACKAGE_ROOT / "lua" / "schema_toggle_processor.lua").read_text(encoding="utf-8")
-    assert 'key:repr() ~= "F4"' in toggle
-    assert 'env.engine:apply_schema(Schema(target))' in toggle
+    assert all("lua_processor" not in item for item in schema["engine"]["processors"])
     deploy = (PACKAGE_ROOT / "helper" / "deploy-rime.ps1").read_text(encoding="utf-8")
     assert "RimeDeployWorkspace" in deploy
     assert "RimeDeployConfigFile" in deploy
@@ -318,6 +310,10 @@ def validate_archive() -> None:
             prefix + "settings.cmd",
             prefix + "bilingual_pinyin.schema.yaml",
             prefix + "bilingual_sogou.schema.yaml",
+            prefix + "inputeng_annotations.schema.yaml",
+            prefix + "inputeng_annotations.dict.yaml",
+            prefix + "inputeng_english.schema.yaml",
+            prefix + "inputeng_english.dict.yaml",
             prefix + "input_translate_core.dict.yaml",
             prefix + "cn_dicts/8105.dict.yaml",
             prefix + "cn_dicts/base.dict.yaml",
@@ -367,6 +363,10 @@ def test_empty_install_cycle(temp_root: Path) -> None:
 
     assert (rime / "bilingual_pinyin.schema.yaml").exists()
     assert (rime / "bilingual_sogou.schema.yaml").exists()
+    assert (rime / "inputeng_annotations.schema.yaml").exists()
+    assert (rime / "inputeng_annotations.dict.yaml").exists()
+    assert (rime / "inputeng_english.schema.yaml").exists()
+    assert (rime / "inputeng_english.dict.yaml").exists()
     assert (rime / "input_translate_core.dict.yaml").exists()
     assert (rime / "cn_dicts" / "8105.dict.yaml").exists()
     assert (rime / "cn_dicts" / "base.dict.yaml").exists()
@@ -395,6 +395,10 @@ def test_empty_install_cycle(temp_root: Path) -> None:
     run_powershell(uninstall, "-RimeUserDir", str(rime), "-StateRoot", str(state), "-SkipDeploy")
     assert not (rime / "bilingual_pinyin.schema.yaml").exists()
     assert not (rime / "bilingual_sogou.schema.yaml").exists()
+    assert not (rime / "inputeng_annotations.schema.yaml").exists()
+    assert not (rime / "inputeng_annotations.dict.yaml").exists()
+    assert not (rime / "inputeng_english.schema.yaml").exists()
+    assert not (rime / "inputeng_english.dict.yaml").exists()
     assert not (rime / "input_translate_core.dict.yaml").exists()
     assert not (rime / "cn_dicts" / "8105.dict.yaml").exists()
     assert not (rime / "cn_dicts" / "base.dict.yaml").exists()
@@ -727,6 +731,10 @@ def main() -> None:
         PACKAGE_ROOT / "english_chinese.tsv",
         PACKAGE_ROOT / "bilingual_pinyin.schema.yaml",
         PACKAGE_ROOT / "bilingual_sogou.schema.yaml",
+        PACKAGE_ROOT / "inputeng_annotations.schema.yaml",
+        PACKAGE_ROOT / "inputeng_annotations.dict.yaml",
+        PACKAGE_ROOT / "inputeng_english.schema.yaml",
+        PACKAGE_ROOT / "inputeng_english.dict.yaml",
         PACKAGE_ROOT / "input_translate_core.dict.yaml",
         PACKAGE_ROOT / "cn_dicts" / "8105.dict.yaml",
         PACKAGE_ROOT / "cn_dicts" / "base.dict.yaml",

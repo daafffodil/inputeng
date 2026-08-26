@@ -12,7 +12,7 @@ if [ ! -x "${CONFIGURE}" ]; then CONFIGURE="${SCRIPT_DIR}/configure-deepseek.com
 
 show_dictionary_status() {
   /usr/bin/osascript <<'APPLESCRIPT'
-display dialog "中文核心词库：173,035 条\n筛选依据：高频简体基础词、规范汉字读音与受控现代词。\n\n离线双语释义：\n中译英 59,872 条\n英译中 58,129 条\n\nWindows 与 macOS 使用同一套核心 Rime 文件和离线词典。" with title "inputeng · 词库" buttons {"好"} default button "好"
+display dialog "中文核心词库：173,036 条\n筛选依据：高频简体基础词、规范汉字读音与受控现代词。\n\n离线双语释义：\n中译英 59,873 条\n英译中 58,129 条\n\nWindows 与 macOS 使用同一套核心 Rime 文件和离线词典。" with title "inputeng · 词库" buttons {"好"} default button "好"
 APPLESCRIPT
 }
 
@@ -46,4 +46,3 @@ while true; do
     *) exit 0 ;;
   esac
 done
-

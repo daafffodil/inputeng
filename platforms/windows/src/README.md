@@ -1,4 +1,4 @@
-# inputeng for Windows v0.6.1
+# inputeng for Windows v0.6.2
 
 普通简体拼音输入，中文候选旁显示简短英文释义；选择候选后只上屏中文。输入 `translate` 这类不能完整解析为拼音的英文时，英文候选旁显示中文小字，选择后只上屏英文。
 
@@ -41,7 +41,7 @@ powershell -ExecutionPolicy Bypass -File .\install.ps1 `
 ## 数据与隐私
 
 - 公开中文主词库只有 `input_translate_core`，由 164,199 条基础词、8,757 条规范汉字读音和 79 条现代补充词组成。
-- 中译英优先使用随包附带的 59,872 条离线短释义；英译中优先使用约 5.8 万条 ECDICT 派生离线短释义。
+- 中译英优先使用随包附带的 59,873 条离线短释义；英译中优先使用约 5.8 万条 ECDICT 派生离线短释义。
 - AI 只接收当前本地未命中的短词，不接收此前上屏文本、应用正文或完整输入历史。
 - API Key 由 Windows DPAPI 按当前账户加密；翻译结果缓存在本机，之后命中不再重复请求。
 - 本地组合词保存在 `%APPDATA%\Rime\input_translate_personal_phrases.tsv`；重新安装不会删除个人数据。

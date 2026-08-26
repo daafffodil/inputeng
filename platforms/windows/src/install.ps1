@@ -17,7 +17,7 @@ $ErrorActionPreference = 'Stop'
 Set-StrictMode -Version 2.0
 
 $ProductName = 'inputeng'
-$ProductVersion = '0.6.1'
+$ProductVersion = '0.6.2'
 $WeaselVersion = '0.17.4'
 $WeaselInstallerName = 'weasel-0.17.4.0-installer.exe'
 $WeaselInstallerUrl = 'https://github.com/rime/weasel/releases/download/0.17.4/weasel-0.17.4.0-installer.exe'
@@ -578,6 +578,10 @@ $backupRoot = Join-Path (Join-Path $StateRoot 'backups') $backupStamp
 $managedSources = @(
     @{ RelativePath = 'bilingual_pinyin.schema.yaml'; Source = (Join-Path $PackageRoot 'bilingual_pinyin.schema.yaml') },
     @{ RelativePath = 'bilingual_sogou.schema.yaml'; Source = (Join-Path $PackageRoot 'bilingual_sogou.schema.yaml') },
+    @{ RelativePath = 'inputeng_annotations.schema.yaml'; Source = (Join-Path $PackageRoot 'inputeng_annotations.schema.yaml') },
+    @{ RelativePath = 'inputeng_annotations.dict.yaml'; Source = (Join-Path $PackageRoot 'inputeng_annotations.dict.yaml') },
+    @{ RelativePath = 'inputeng_english.schema.yaml'; Source = (Join-Path $PackageRoot 'inputeng_english.schema.yaml') },
+    @{ RelativePath = 'inputeng_english.dict.yaml'; Source = (Join-Path $PackageRoot 'inputeng_english.dict.yaml') },
     @{ RelativePath = 'input_translate_core.dict.yaml'; Source = (Join-Path $PackageRoot 'input_translate_core.dict.yaml') },
     @{ RelativePath = 'cn_dicts\8105.dict.yaml'; Source = (Join-Path $PackageRoot 'cn_dicts\8105.dict.yaml') },
     @{ RelativePath = 'cn_dicts\base.dict.yaml'; Source = (Join-Path $PackageRoot 'cn_dicts\base.dict.yaml') },

@@ -86,6 +86,8 @@ def main() -> None:
     dll.RimeGetContext.argtypes = [C.c_size_t, C.POINTER(Context)]
     dll.RimeGetContext.restype = C.c_int
     dll.RimeFreeContext.argtypes = [C.POINTER(Context)]
+    dll.RimeSelectCandidate.argtypes = [C.c_size_t, C.c_int]
+    dll.RimeSelectCandidate.restype = C.c_int
     dll.RimeDestroySession.argtypes = [C.c_size_t]
 
     buffers: list[C.Array] = []
@@ -142,14 +144,22 @@ def main() -> None:
             if session:
                 dll.RimeDestroySession(session)
 
-    def commit_second_then_first(code: str) -> None:
+    def commit_segments(code: str, expected: tuple[str, ...]) -> None:
         session = dll.RimeCreateSession()
         try:
             assert session and dll.RimeSelectSchema(session, b"bilingual_pinyin")
             for byte in code.encode("ascii"):
                 assert dll.RimeProcessKey(session, byte, 0)
-            assert dll.RimeProcessKey(session, ord("2"), 0)
-            assert dll.RimeProcessKey(session, 32, 0)
+            for target in expected:
+                context = Context()
+                context.data_size = C.sizeof(Context) - C.sizeof(C.c_int)
+                assert dll.RimeGetContext(session, C.byref(context))
+                try:
+                    texts = [decode(context.menu.candidates[index].text) for index in range(context.menu.num_candidates)]
+                    assert target in texts, (target, texts)
+                    assert dll.RimeSelectCandidate(session, texts.index(target))
+                finally:
+                    dll.RimeFreeContext(C.byref(context))
         finally:
             if session:
                 dll.RimeDestroySession(session)
@@ -226,26 +236,11 @@ def main() -> None:
 
         f4_toggle = verify_f4_toggle()
 
-        # Verify first-use phrase learning, then restore the user's data.
-        personal_phrases = USER / "input_translate_personal_phrases.tsv"
-        personal_version = USER / "input_translate_personal_phrases.version"
-        personal_existed = personal_phrases.exists()
-        version_existed = personal_version.exists()
-        personal_before = personal_phrases.read_bytes() if personal_existed else b""
-        version_before = personal_version.read_bytes() if version_existed else b""
-        try:
-            commit_second_then_first("dangdangyixia")
-            learned = personal_phrases.read_text(encoding="utf-8")
-            assert any(line.startswith("dangdangyixia\t") for line in learned.splitlines()), learned
-        finally:
-            if personal_existed:
-                personal_phrases.write_bytes(personal_before)
-            elif personal_phrases.exists():
-                personal_phrases.unlink()
-            if version_existed:
-                personal_version.write_bytes(version_before)
-            elif personal_version.exists():
-                personal_version.unlink()
+        # ScriptTranslator learns a phrase after the first segmented commit. The
+        # smoke user is isolated, so this never touches the user's live LevelDB.
+        commit_segments("jiaozichuang", ("饺子", "床"))
+        learned_phrase = candidates_for("jiaozichuang")
+        assert learned_phrase and learned_phrase[0][0] == "饺子床", learned_phrase
 
         print("dongxi=", dongxi)
         print("meifense=", modern)
@@ -265,6 +260,7 @@ def main() -> None:
         print("preedit=", preedit)
         print("sogou_nihk=", sogou_preedit, sogou)
         print("f4_toggle=", f4_toggle)
+        print("learned_phrase=", learned_phrase)
         print("INPUTENG_REAL_RIME_SMOKE_PASSED")
     finally:
         dll.RimeFinalize()

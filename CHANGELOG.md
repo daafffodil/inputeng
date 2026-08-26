@@ -1,5 +1,12 @@
 # Changelog
 
+## v0.6.2
+
+- Moved exact offline annotations, direct English input, F4 schema switching, and first-commit phrase learning out of the per-key Lua hot path and into native librime components.
+- Reduced the active Lua path to one lightweight AI-cache filter; the 59k offline glossary is no longer parsed or searched by Lua on every key press.
+- On Windows + Weasel 0.17.4, isolated librime benchmarks improved median per-key processing from 8.86 ms to about 0.32 ms and p95 from 17.13 ms to about 1.2 ms; median session creation improved from about 495 ms to roughly 90 ms.
+- Updated both Windows and macOS packages to the same optimized core and added generated native annotation/English dictionaries to installation, upgrade, and uninstall coverage.
+
 ## v0.6.1
 
 - Stopped applying Windows TSF name/icon branding during normal installation, avoiding an unnecessary administrator prompt and global changes shared by every Weasel scheme.

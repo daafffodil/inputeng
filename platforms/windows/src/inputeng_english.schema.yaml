@@ -1,0 +1,22 @@
+# Rime schema
+# encoding: utf-8
+
+# Build-only dependency for the native exact-match English candidate table.
+__include: luna_pinyin_simp.schema:/
+
+schema:
+  schema_id: inputeng_english
+  name: inputeng English compiler
+  version: "0.6.2"
+
+engine:
+  translators:
+    - table_translator
+
+translator:
+  dictionary: inputeng_english
+  prism: inputeng_english
+  enable_user_dict: false
+
+speller:
+  alphabet: abcdefghijklmnopqrstuvwxyz

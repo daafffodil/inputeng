@@ -28,7 +28,7 @@ inputeng 是一个基于 Rime 的简体中文输入方案。正常输入中文�
 
 [下载最新版本](https://github.com/daafffodil/inputeng/releases/latest)
 
-1. 下载并完整解压 `inputeng-windows-v0.6.1.zip`。
+1. 下载并完整解压 `inputeng-windows-v0.6.2.zip`。
 2. 双击 `install.cmd`。
 3. 如果电脑尚未安装小狼毫，安装器会询问是否从 Rime 官方 GitHub 下载固定版本，并校验 SHA-256。
 4. 安装完成后，在 Windows 输入法列表中选择 **小狼毫**；inputeng 方案已经在其中启用。
@@ -38,7 +38,11 @@ inputeng 是一个基于 Rime 的简体中文输入方案。正常输入中文�
 
 ### macOS
 
-macOS 版依赖近期正式版鼠须管。v0.6.1 与 Windows 共用同一套中文核心词库、双向离线释义、全拼/搜狗双拼、F4 切换、个人短语学习和 DeepSeek 缺词翻译；API Key 保存到 macOS 钥匙串。安装步骤见 [macOS 说明](platforms/macos-rime/README.md)。
+macOS 版依赖近期正式版鼠须管。v0.6.2 与 Windows 共用同一套优化后的中文核心词库、原生双向离线释义、全拼/搜狗双拼、F4 切换、首次组合学习和 DeepSeek 缺词翻译；API Key 保存到 macOS 钥匙串。安装步骤见 [macOS 说明](platforms/macos-rime/README.md)。
+
+## v0.6.2 输入延迟优化
+
+离线注释、英文直输、F4 切换和组合学习现在由 librime 原生组件处理；每次按键只保留一个轻量 Lua 过滤器读取 AI 缓存，不再让 Lua 加载并逐键查询约 5.9 万条离线释义。在 Windows + 小狼毫 0.17.4 的隔离测试中，逐键处理耗时中位数从约 8.86 ms 降至 0.32 ms，p95 从约 17.13 ms 降至 1.19 ms。
 
 ## AI 翻译与 API Key
 
@@ -52,8 +56,8 @@ AI 翻译完全可选。仓库和发布包中**不包含作者的 API Key，也�
 
 ## 词库
 
-- 中文核心词库：173,035 条。基础词来自经过筛选的 [Rime Ice](https://github.com/iDvel/rime-ice) 简体词库，并保留规范汉字读音。
-- 中译英短释义：59,872 条，来自 [CC-CEDICT](https://www.mdbg.net/chinese/dictionary?page=cc-cedict) 的裁剪和短释义转换。
+- 中文核心词库：173,036 条。基础词来自经过筛选的 [Rime Ice](https://github.com/iDvel/rime-ice) 简体词库，并保留规范汉字读音。
+- 中译英短释义：59,873 条，来自 [CC-CEDICT](https://www.mdbg.net/chinese/dictionary?page=cc-cedict) 的裁剪和短释义转换。
 - 英译中短释义：58,129 条，来自 [ECDICT](https://github.com/skywind3000/ECDICT) 的常用词裁剪。
 
 详细来源、修改说明和许可见 [THIRD_PARTY_NOTICES.md](THIRD_PARTY_NOTICES.md)。项目代码采用 MIT License；第三方词库继续遵循各自许可证。
@@ -81,6 +85,7 @@ Windows 的完整候选冒烟测试还需要本机存在可加载的 librime / �
 
 ```powershell
 python platforms/windows/scripts/smoke_rime.py
+python platforms/windows/scripts/benchmark_rime.py --max-p95-ms 5
 ```
 
 ## 项目结构
